@@ -52,6 +52,14 @@ pipeline {
                     }
                  }
         }
+	
+	stage('Create Package') {
+            steps {
+                echo "Creating Package"
+                sh 'mvn package'
+            }
+        }
+	
         stage('Nexus Deployment'){
            steps {
 				sh'mvn clean deploy -Dmaven.test.skip=true -Dresume=false'
