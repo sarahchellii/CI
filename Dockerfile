@@ -1,7 +1,7 @@
 FROM openjdk:14-alpine
 RUN mkdir app
 WORKDIR /app
-COPY /target/sarahchelli-1.0.jar sarahchelli-1.0.jar  
+COPY /target/ExamThourayaS2-0.0.1.jar ExamThourayaS2-0.0.1.jar  
 EXPOSE 8089
-RUN chmod 777 sarahchelli-1.0.jar
-CMD ["java","-jar","sarahchelli-1.0.jar"]
+RUN chmod 777 ExamThourayaS2-0.0.1.jar
+CMD ["java","-jar","ExamThourayaS2-0.0.1.jar"]
