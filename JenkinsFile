@@ -63,7 +63,7 @@ pipeline {
 	 stage('Sonarqube analysis'){
             steps {
                  echo "Executing SonarQube Analysis";
-                  sh 'mvn package sonar:sonar -Dsonar.host.url=http://192.168.1.5:9000 -Dmaven.test.failure.ignore=true -Dsonar.login=058ee1163613b8b81d62ba9716feb976a0c5de1f'
+                  sh 'mvn package sonar:sonar -Dsonar.host.url=http://192.168.1.5:9000 -Dmaven.test.failure.ignore=true -Dsonar.login="admin" -Dsonar.password="727245"'
                       }
                    }
                    
