@@ -1,0 +1,89 @@
+pipeline {
+    environment { 
+        registry = "sarahch/cirepo" 
+        registryCredential = 'dockerhub_id' 
+        dockerImage = '' 
+    }    
+    agent any
+
+    tools {
+        // Install the Maven version configured as "M2_HOME" and add it to the path.
+        maven "M2_HOME"
+    }
+
+    stages {
+        stage('GIT') {
+            steps {
+                // Get some code from a GitHub repository
+                git branch: 'main',
+                    url: 'https://github.com/sarahchellii/CI'
+                // Run Maven on a Unix agent.
+                sh "mvn -Dmaven.test.failure.ignore=true clean package"
+            }
+        }    
+        stage('MVN Clean') {
+            steps {
+                script
+                    {
+                        if (isUnix()) 
+                            {
+                                sh 'mvn --batch-mode clean'
+                            }
+                            else
+                            {
+                                bat 'mvn --batch-mode clean'
+                            }
+                    }
+                }
+            }
+    
+        stage('Build'){
+            steps{
+                script
+                    {
+                        if (isUnix()) 
+                            {
+                                sh 'mvn --batch-mode compile'
+                            }
+                        else
+                            {
+                                bat 'mvn --batch-mode compile'
+                            }
+                    }
+                 }
+        }
+        stage('Nexus Deployment'){
+           steps {
+				sh'mvn clean deploy -Dmaven.test.skip=true -Dresume=false'
+			}
+        }
+        stage('Building our image') { 
+            steps { 
+                script { 
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER" 
+                }
+            } 
+        }
+        stage('Deploy our image') { 
+            steps { 
+                script { 
+                    docker.withRegistry( '', registryCredential ) { 
+                        dockerImage.push() 
+                    }
+                } 
+            }
+        } 
+        stage('Cleaning up') { 
+            steps { 
+                sh "docker rmi $registry:$BUILD_NUMBER" 
+            }
+        } 
+         stage("Docker Compose"){
+         steps{
+                sh 'docker-compose up '
+				sh 'docker ps '
+            }	
+        }
+    }
+        
+}
